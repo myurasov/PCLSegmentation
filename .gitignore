@@ -7,3 +7,12 @@ data/
 logs/
 models/
 output/
+
+.ipynb_checkpoints/
+.tensorboard/
+.keras/
+.virtual_documents/
+_data/
+_out/
+__*/
+__*.*
