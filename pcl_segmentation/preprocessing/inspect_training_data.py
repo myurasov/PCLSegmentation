@@ -63,8 +63,8 @@ def main(args):
     else:
         outfile_path, output_mask_path = None, None
 
-    target_width = 240
-    target_height = 32
+    target_width = config.AZIMUTH_LEVEL
+    target_height = config.ZENITH_LEVEL
 
     print("Number of Files:", len(input_files))
 
