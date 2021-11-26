@@ -22,14 +22,25 @@
 # SOFTWARE.
 # ==============================================================================
 
-import os.path
 
 import argparse
+import os.path
+import shlex
+
+import tensorflow as tf
 
 from data_loader import DataLoader
+from utils.args_loader import load_model_config
 from utils.callbacks import TensorBoard
 from utils.util import *
-from utils.args_loader import load_model_config
+
+# arguments for debugging
+
+debug_args = (
+    '--data_path="../../_data/pandaset_converted_256x256" '
+    + '--train_dir="../../_data/output" '
+    + "--epochs=5 --model=squeezesegv2"
+)
 
 
 def train(arg):
@@ -102,5 +113,8 @@ if __name__ == "__main__":
         help="Model name either `squeezesegv2`, `darknet53`, `darknet21`",
     )
     args = parser.parse_args()
+
+    if debug_args is not None:
+        args = parser.parse_args(shlex.split(debug_args))
 
     train(args)
