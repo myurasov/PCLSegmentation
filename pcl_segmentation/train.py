@@ -33,49 +33,74 @@ from utils.args_loader import load_model_config
 
 
 def train(arg):
-  config, model = load_model_config(args.model)
+    config, model = load_model_config(args.model)
 
-  train = DataLoader("train", arg.data_path, config).write_tfrecord_dataset().read_tfrecord_dataset()
-  val = DataLoader("val", arg.data_path, config).write_tfrecord_dataset().read_tfrecord_dataset()
+    train = (
+        DataLoader("train", arg.data_path, config)
+        .write_tfrecord_dataset()
+        .read_tfrecord_dataset()
+    )
+    val = (
+        DataLoader("val", arg.data_path, config)
+        .write_tfrecord_dataset()
+        .read_tfrecord_dataset()
+    )
 
-  tensorboard_callback = TensorBoard(arg.train_dir, val, profile_batch=(95, 100))
-  checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(os.path.join(arg.train_dir, "checkpoint"))
+    tensorboard_callback = TensorBoard(arg.train_dir, val, profile_batch=(95, 100))
+    checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+        os.path.join(arg.train_dir, "checkpoint")
+    )
 
-  lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
-    initial_learning_rate=config.LEARNING_RATE,
-    decay_steps=config.LR_DECAY_STEPS,
-    decay_rate=config.LR_DECAY_FACTOR,
-    staircase=True)
+    lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+        initial_learning_rate=config.LEARNING_RATE,
+        decay_steps=config.LR_DECAY_STEPS,
+        decay_rate=config.LR_DECAY_FACTOR,
+        staircase=True,
+    )
 
-  optimizer = tf.keras.optimizers.Adam(learning_rate=lr_schedule, clipnorm=config.MAX_GRAD_NORM)
+    optimizer = tf.keras.optimizers.Adam(
+        learning_rate=lr_schedule, clipnorm=config.MAX_GRAD_NORM
+    )
 
-  model.compile(optimizer=optimizer)
+    model.compile(optimizer=optimizer)
 
-  model.fit(train,
-            validation_data=val,
-            epochs=arg.epochs,
-            callbacks=[tensorboard_callback, checkpoint_callback],
-            )
+    model.fit(
+        train,
+        validation_data=val,
+        epochs=arg.epochs,
+        callbacks=[tensorboard_callback, checkpoint_callback],
+    )
 
-  model.save(filepath=os.path.join(arg.train_dir, 'model'))
+    model.save(filepath=os.path.join(arg.train_dir, "model"))
 
 
-if __name__ == '__main__':
-  physical_devices = tf.config.experimental.list_physical_devices('GPU')
-  if len(physical_devices) > 0:
-    tf.config.experimental.set_memory_growth(physical_devices[0], True)
+if __name__ == "__main__":
+    physical_devices = tf.config.experimental.list_physical_devices("GPU")
+    if len(physical_devices) > 0:
+        tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
-  parser = argparse.ArgumentParser(description='Parse Flags for the training script!')
-  parser.add_argument('-d', '--data_path', type=str,
-                      help='Absolute path to the dataset')
-  parser.add_argument('-n', '--net', type=str, default='squeezeSeg',
-                      help='Network architecture')
-  parser.add_argument('-e', '--epochs', type=int, default=50,
-                      help='Maximal number of training epochs')
-  parser.add_argument('-t', '--train_dir', type=str,
-                      help="Directory where to write the Tensorboard logs and checkpoints")
-  parser.add_argument('-m', '--model', type=str,
-                      help='Model name either `squeezesegv2`, `darknet53`, `darknet21`')
-  args = parser.parse_args()
+    parser = argparse.ArgumentParser(description="Parse Flags for the training script!")
+    parser.add_argument(
+        "-d", "--data_path", type=str, help="Absolute path to the dataset"
+    )
+    parser.add_argument(
+        "-n", "--net", type=str, default="squeezeSeg", help="Network architecture"
+    )
+    parser.add_argument(
+        "-e", "--epochs", type=int, default=50, help="Maximal number of training epochs"
+    )
+    parser.add_argument(
+        "-t",
+        "--train_dir",
+        type=str,
+        help="Directory where to write the Tensorboard logs and checkpoints",
+    )
+    parser.add_argument(
+        "-m",
+        "--model",
+        type=str,
+        help="Model name either `squeezesegv2`, `darknet53`, `darknet21`",
+    )
+    args = parser.parse_args()
 
-  train(args)
+    train(args)
