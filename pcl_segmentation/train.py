@@ -114,7 +114,8 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    if debug_args is not None:
-        args = parser.parse_args(shlex.split(debug_args))
+    if args.model is None:
+        if debug_args is not None:
+            args = parser.parse_args(shlex.split(debug_args))
 
     train(args)
