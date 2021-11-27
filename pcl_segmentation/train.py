@@ -37,8 +37,9 @@ from utils.util import *
 # arguments for debugging
 
 debug_args = (
-    '--data_path="../../_data/pandaset_converted_256x256" '
-    + '--train_dir="../../_data/output" '
+    '--data_path="/app/_data/pandaset_converted_256x256" '
+    + '--checkpoints_dir="/app/_data/output" '
+    + '--tensorboard_dir="/app/.tensorboard" '
     + "--epochs=5 --model=squeezesegv2"
 )
 
@@ -57,9 +58,11 @@ def train(arg):
         .read_tfrecord_dataset()
     )
 
-    tensorboard_callback = TensorBoard(arg.train_dir, val, profile_batch=(95, 100))
+    tensorboard_callback = TensorBoard(
+        arg.tensorboard_dir, val, profile_batch=(95, 100)
+    )
     checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-        os.path.join(arg.train_dir, "checkpoint")
+        os.path.join(arg.checkpoints_dir, "checkpoint")
     )
 
     lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
@@ -88,7 +91,8 @@ def train(arg):
 if __name__ == "__main__":
     physical_devices = tf.config.experimental.list_physical_devices("GPU")
     if len(physical_devices) > 0:
-        tf.config.experimental.set_memory_growth(physical_devices[0], True)
+        for device in physical_devices:
+            tf.config.experimental.set_memory_growth(device, True)
 
     parser = argparse.ArgumentParser(description="Parse Flags for the training script!")
     parser.add_argument(
@@ -101,10 +105,14 @@ if __name__ == "__main__":
         "-e", "--epochs", type=int, default=50, help="Maximal number of training epochs"
     )
     parser.add_argument(
-        "-t",
-        "--train_dir",
+        "--checkpoints_dir",
         type=str,
-        help="Directory where to write the Tensorboard logs and checkpoints",
+        help="Directory where to write the checkpoints",
+    )
+    parser.add_argument(
+        "--tensorboard_dir",
+        type=str,
+        help="TensorBoard directory",
     )
     parser.add_argument(
         "-m",
