@@ -33,7 +33,7 @@ import time
 import argparse
 
 sys.path.append(".")
-from configs.SqueezeSegV2_512x512 import SqueezeSegV2Config
+from configs import SqueezeSegV2Config
 
 
 class RunningStd(object):

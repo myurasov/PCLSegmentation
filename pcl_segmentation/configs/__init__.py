@@ -1,1 +1,1 @@
-from .SqueezeSegV2 import SqueezeSegV2Config
+from .SqueezeSegV2_512x512 import SqueezeSegV2Config
