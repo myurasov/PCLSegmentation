@@ -33,7 +33,7 @@ import time
 import argparse
 
 sys.path.append(".")
-from configs import SqueezeSegV2Config
+from configs.SqueezeSegV2_512x512 import SqueezeSegV2Config
 
 
 class RunningStd(object):
@@ -164,6 +164,35 @@ def main(args):
 
     print("distances_mean = ", np.mean(all_d_means))
     print("distances_std  = ", ov_d.std)
+
+    # print values to be pasted into the config
+    print(
+        "\nPaste to mc.INPUT_MEAN:\n"
+        + str(
+            [
+                np.mean(all_x_means),
+                np.mean(all_y_means),
+                np.mean(all_z_means),
+                np.mean(all_i_means),
+                np.mean(all_d_means),
+            ]
+        )
+        + "\n"
+    )
+
+    print(
+        "\nPaste to mc.INPUT_STD:\n"
+        + str(
+            [
+                ov_x.std,
+                ov_y.std,
+                ov_z.std,
+                ov_i.std,
+                ov_d.std,
+            ]
+        )
+        + "\n"
+    )
 
     mask = np.mean(all_depths, axis=0)
 
