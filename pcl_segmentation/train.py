@@ -85,7 +85,7 @@ def train(arg):
         callbacks=[tensorboard_callback, checkpoint_callback],
     )
 
-    model.save(filepath=os.path.join(arg.train_dir, "model"))
+    model.save(filepath=os.path.join(arg.checkpoints_dir, "model"))
 
 
 if __name__ == "__main__":
